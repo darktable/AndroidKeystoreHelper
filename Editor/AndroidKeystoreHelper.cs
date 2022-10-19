@@ -28,7 +28,12 @@ namespace com.darktable.utility {
         private static void Initialize() {
             string keystoreName = PlayerSettings.Android.keystoreName;
 
-            if (string.IsNullOrEmpty(keystoreName)) {
+            const string k_BuiltInKeyStoreName = "protokit_basic_debug.keystore";
+
+            if (string.IsNullOrEmpty(keystoreName) 
+                || Path.GetFileName(keystoreName).Equals(k_BuiltInKeyStoreName, 
+                    StringComparison.InvariantCultureIgnoreCase))
+            {
                 return;
             }
 
