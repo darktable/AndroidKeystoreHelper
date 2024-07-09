@@ -34,7 +34,7 @@ namespace com.darktable.utility {
 
             string keystoreDirectory = Path.GetDirectoryName(keystoreName);
 
-            if (string.IsNullOrEmpty(keystoreDirectory)) {
+            if (string.IsNullOrEmpty(keystoreDirectory) || !Directory.Exists(keystoreDirectory)) {
                 return;
             }
 
