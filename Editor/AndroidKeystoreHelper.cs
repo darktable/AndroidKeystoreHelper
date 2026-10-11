@@ -53,12 +53,24 @@ namespace com.darktable.utility {
                 keystoreInfo.aliasName = PlayerSettings.Android.keyaliasName;
 
                 File.WriteAllText(jsonFilePath, EditorJsonUtility.ToJson(keystoreInfo, true));
+
+                // The JSON is for plaintext passwords. Inside the project it is one `git add .` from being
+                // committed unless .gitignore covers it. Warned once, at creation, not on every reload.
+                string projectRoot = Path.GetFullPath(Path.Combine(Application.dataPath, ".."));
+                if (Path.GetFullPath(jsonFilePath).StartsWith(projectRoot, StringComparison.OrdinalIgnoreCase)) {
+                    Debug.LogWarning($"[AndroidKeystoreHelper] Created {jsonFilePath} inside the project. It will hold "
+                        + "keystore passwords: make sure *_settings.json is git-ignored.");
+                }
             }
             else {
                 EditorJsonUtility.FromJsonOverwrite(File.ReadAllText(jsonFilePath), keystoreInfo);
             }
 
-            if (PlayerSettings.Android.keystoreName == keystoreInfo.keystoreName) {
+            if (PlayerSettings.Android.keystoreName != keystoreInfo.keystoreName) {
+                Debug.LogWarning($"[AndroidKeystoreHelper] {jsonFilePath} is for keystore '{keystoreInfo.keystoreName}', "
+                    + $"but Player Settings uses '{PlayerSettings.Android.keystoreName}'. Passwords not filled in.");
+            }
+            else {
                 if (string.IsNullOrEmpty(PlayerSettings.Android.keystorePass)
                     && !string.IsNullOrEmpty(keystoreInfo.keystorePass)) {
                     Debug.Log("setting keystore password");
